@@ -1,13 +1,8 @@
 package com.hritvik.BankingBackend.model;
 
-<<<<<<< HEAD
+
 import jakarta.persistence.*;
-=======
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
->>>>>>> origin/main
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,11 +32,8 @@ public class Transaction {
     private LocalDate createdAt;
     @UpdateTimestamp
     private LocalDate modifiedAt;
-<<<<<<< HEAD
 
     @ManyToOne
     @JoinColumn(name="fk_user_id")
     private User user;
-=======
->>>>>>> origin/main
 }
