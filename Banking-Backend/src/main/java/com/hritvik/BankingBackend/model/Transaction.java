@@ -29,13 +29,10 @@ public class Transaction {
     private String status;
     private String toAccountNumber;
 
-
     @CreationTimestamp
     private LocalDate createdAt;
-    @UpdateTimestamp
-    private LocalDate modifiedAt;
 
-    @ManyToOne
-    @JoinColumn(name="fk_user_id")
-    private User user;
+//    @ManyToOne
+//    @JoinColumn(name="fk_user_id")
+//    private User user;
 }
