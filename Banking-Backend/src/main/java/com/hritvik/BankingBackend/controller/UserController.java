@@ -1,9 +1,6 @@
 package com.hritvik.BankingBackend.controller;
 
-import com.hritvik.BankingBackend.model.dto.BankResponse;
-import com.hritvik.BankingBackend.model.dto.CreditDebitRequest;
-import com.hritvik.BankingBackend.model.dto.EnquiryRequest;
-import com.hritvik.BankingBackend.model.dto.UserRequest;
+import com.hritvik.BankingBackend.model.dto.*;
 import com.hritvik.BankingBackend.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +31,11 @@ public class UserController {
     @PostMapping("debit")
     public BankResponse debitAccount(@RequestBody CreditDebitRequest request){
         return userService.debitAccount(request);
+    }
+
+    @PostMapping("transfer")
+    public BankTransferResponse transferAmount(@RequestBody TransferRequest transferRequest){
+        return userService.transferAmount(transferRequest);
     }
 
 

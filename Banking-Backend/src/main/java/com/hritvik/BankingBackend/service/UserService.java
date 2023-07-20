@@ -184,6 +184,106 @@ public class UserService {
                             .build())
                     .build();
         }
+    }
+
+
+    public BankTransferResponse transferAmount(TransferRequest request) {
+        //check if the account exists
+        //check if the amount you intend to withdraw is not more than the current account balance
+        boolean isFromAccountExist = userRepository.existsByAccountNumber(request.getFromAccountNumber());
+        boolean isToAccountExist = userRepository.existsByAccountNumber(request.getToAccountNumber());
+
+
+        if (!isFromAccountExist) {
+
+            return BankTransferResponse.builder()
+                    .responseCodeForDebit(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseMessageDebit(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
+//                        .accountInfoDebit(null)
+//                        .responseCodeForCredit(null)
+//                        .responseMessageCredit(null)
+//                        .accountInfoCredit(null)
+                    .build();
+        }
+        if (!isToAccountExist) {
+            return BankTransferResponse.builder()
+                    .responseCodeForDebit(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseMessageDebit(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
+//                        .accountInfoDebit(null)
+//                        .responseCodeForCredit(null)
+//                        .responseMessageCredit(null)
+//                        .accountInfoCredit(null)
+                    .build();
+        }
+
+        User userToDebit = userRepository.findByAccountNumber(request.getFromAccountNumber());
+        BigInteger availableBalance = userToDebit.getAccountBalance().toBigInteger();
+        BigInteger debitAmount = request.getAmountToTransfer().toBigInteger();
+        if (availableBalance.intValue() < debitAmount.intValue()) {
+
+            return BankTransferResponse.builder()
+                    .responseCodeForDebit(AccountUtils.INSUFFICIENT_BALANCE_CODE)
+                    .responseMessageDebit(AccountUtils.INSUFFICIENT_BALANCE_MESSAGE)
+                    .accountInfoDebit(null)
+                    .responseCodeForCredit(null)
+                    .responseMessageCredit(null)
+                    .accountInfoCredit(null)
+                    .build();
+        } else {
+            userToDebit.setAccountBalance(userToDebit.getAccountBalance().subtract(request.getAmountToTransfer()));
+            userRepository.save(userToDebit);
+
+            //Send email Alert
+            EmailDetails emailDetailsDebit = EmailDetails.builder()
+                    .recipient(userToDebit.getEmail())
+                    .subject("Account Balance Debited")
+                    .messageBody("\nYour Account Details: \n" +
+                            "Account Name: " + userToDebit.getFirstName() + " "
+                            + userToDebit.getLastName() + " "
+                            + "\nAccount Number: " + userToDebit.getAccountNumber()
+                            + "\nBalance to Debit : " + request.getToAccountNumber()
+                            + "\nUpdated Balance : " + userToDebit.getAccountBalance())
+                    .build();
+            emailService.sendEmailAlert(emailDetailsDebit);
+
+
+            User userToCredit = userRepository.findByAccountNumber(request.getToAccountNumber());
+            userToCredit.setAccountBalance(userToCredit.getAccountBalance().add(request.getAmountToTransfer()));
+            userRepository.save(userToCredit);
+
+            //Send email Alert
+            EmailDetails emailDetailsCredit = EmailDetails.builder()
+                    .recipient(userToCredit.getEmail())
+                    .subject("Account Balance Credited")
+                    .messageBody("\nYour Account Details: \n" +
+                            "Account Name: " + userToCredit.getFirstName() + " "
+                            + userToCredit.getLastName() + " "
+                            + "\nAccount Number: " + userToCredit.getAccountNumber()
+                            + "\nBalance to Credit : " + request.getAmountToTransfer()
+                            + "\nUpdate Balance : " + userToCredit.getAccountBalance())
+                    .build();
+            emailService.sendEmailAlert(emailDetailsCredit);
+
+
+            return BankTransferResponse.builder()
+                    .responseCodeForDebit(AccountUtils.ACCOUNT_DEBITED_SUCCESS)
+                    .responseMessageDebit(AccountUtils.ACCOUNT_DEBITED_MESSAGE)
+                    .accountInfoDebit(AccountInfo.builder()
+                            .accountNumber(request.getFromAccountNumber())
+                            .accountName(userToDebit.getFirstName() + " " + userToDebit.getLastName())
+                            .accountBalance(userToDebit.getAccountBalance())
+                            .build())
+                    .responseCodeForCredit(AccountUtils.ACCOUNT_CREDITED_SUCCESS)
+                    .responseMessageCredit(AccountUtils.ACCOUNT_CREDITED_SUCCESS_MESSAGE)
+                    .accountInfoCredit(AccountInfo.builder()
+                            .accountNumber(request.getToAccountNumber())
+                            .accountName(userToCredit.getFirstName() + " " + userToCredit.getLastName())
+                            .accountBalance(userToCredit.getAccountBalance())
+                            .build())
+                    .build();
+
+
+        }
 
     }
 }
