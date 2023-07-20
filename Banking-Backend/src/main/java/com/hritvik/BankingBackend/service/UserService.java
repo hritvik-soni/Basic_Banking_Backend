@@ -117,6 +117,7 @@ public class UserService {
                 .transactionType("CREDIT")
                 .accountNumber(userToCredit.getAccountNumber())
                 .amount(request.getAmount())
+                .toAccountNumber(null)
                 .build();
         transactionalService.saveTransactional(transactionInfo);
 
@@ -176,6 +177,7 @@ public class UserService {
                     .transactionType("DEBIT")
                     .accountNumber(userToDebit.getAccountNumber())
                     .amount(request.getAmount())
+                    .toAccountNumber(null)
                     .build();
             transactionalService.saveTransactional(transactionInfo);
 
@@ -256,6 +258,7 @@ public class UserService {
                     .transactionType("DEBIT")
                     .accountNumber(userToDebit.getAccountNumber())
                     .amount(request.getAmountToTransfer())
+                    .toAccountNumber(request.getToAccountNumber())
                     .build();
             transactionalService.saveTransactional(transactionInfoDebit);
 
@@ -281,6 +284,7 @@ public class UserService {
                     .transactionType("DEBIT")
                     .accountNumber(userToCredit.getAccountNumber())
                     .amount(request.getAmountToTransfer())
+                    .toAccountNumber(request.getFromAccountNumber())
                     .build();
             transactionalService.saveTransactional(transactionInfoCredit);
 

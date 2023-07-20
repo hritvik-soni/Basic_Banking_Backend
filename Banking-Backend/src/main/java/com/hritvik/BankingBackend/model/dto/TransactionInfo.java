@@ -17,4 +17,5 @@ public class TransactionInfo {
     private BigDecimal amount;
     private String accountNumber;
     private String status;
+    private String toAccountNumber;
 }
