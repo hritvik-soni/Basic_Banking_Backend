@@ -1,10 +1,14 @@
 package com.hritvik.BankingBackend.controller;
 
+import com.hritvik.BankingBackend.model.Transaction;
 import com.hritvik.BankingBackend.model.dto.*;
+import com.hritvik.BankingBackend.service.StatementService;
 import com.hritvik.BankingBackend.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -12,6 +16,8 @@ public class UserController {
 
     @Autowired
     UserService userService;
+    @Autowired
+    StatementService statementService;
 
     @PostMapping
     public BankResponse createAccount(@Valid @RequestBody UserRequest userRequest){
@@ -36,6 +42,15 @@ public class UserController {
     @PostMapping("transfer")
     public BankTransferResponse transferAmount(@RequestBody TransferRequest transferRequest){
         return userService.transferAmount(transferRequest);
+    }
+
+    @GetMapping("statement")
+    public BankResponse generateStatement(@RequestParam String accountNumber ,
+                                               @RequestParam String startDate ,
+                                               @RequestParam String endDate){
+
+
+        return statementService.generateStatement(accountNumber,startDate,endDate);
     }
 
 

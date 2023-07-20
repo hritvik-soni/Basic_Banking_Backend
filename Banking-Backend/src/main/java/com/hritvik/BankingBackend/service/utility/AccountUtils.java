@@ -42,6 +42,9 @@ public class AccountUtils {
     public static final String ACCOUNT_DEBITED_SUCCESS = "007";
     public static final String ACCOUNT_DEBITED_MESSAGE = "Account has been successfully debited";
 
+    public static final String ACCOUNT_STATEMENT_SENT_CODE = "008";
+    public static final String ACCOUNT_STATEMENT_SENT_MESSAGE = "Account statement has been sent successfully";
+
 
 
 

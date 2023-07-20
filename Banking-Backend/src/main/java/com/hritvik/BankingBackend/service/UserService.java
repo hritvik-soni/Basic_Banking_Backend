@@ -21,6 +21,9 @@ public class UserService {
     @Autowired
     EmailService emailService;
 
+    @Autowired
+    TransactionalService transactionalService;
+
 
     public BankResponse createAccount(UserRequest userRequest) {
         /**
@@ -110,6 +113,13 @@ public class UserService {
         userToCredit.setAccountBalance(userToCredit.getAccountBalance().add(request.getAmount()));
         userRepository.save(userToCredit);
 
+        TransactionInfo transactionInfo= TransactionInfo.builder()
+                .transactionType("CREDIT")
+                .accountNumber(userToCredit.getAccountNumber())
+                .amount(request.getAmount())
+                .build();
+        transactionalService.saveTransactional(transactionInfo);
+
         //Send email Alert
         EmailDetails emailDetails = EmailDetails.builder()
                 .recipient(userToCredit.getEmail())
@@ -159,6 +169,15 @@ public class UserService {
         } else {
             userToDebit.setAccountBalance(userToDebit.getAccountBalance().subtract(request.getAmount()));
             userRepository.save(userToDebit);
+
+// saved transaction
+
+            TransactionInfo transactionInfo= TransactionInfo.builder()
+                    .transactionType("DEBIT")
+                    .accountNumber(userToDebit.getAccountNumber())
+                    .amount(request.getAmount())
+                    .build();
+            transactionalService.saveTransactional(transactionInfo);
 
             //Send email Alert
             EmailDetails emailDetails = EmailDetails.builder()
@@ -233,6 +252,13 @@ public class UserService {
             userToDebit.setAccountBalance(userToDebit.getAccountBalance().subtract(request.getAmountToTransfer()));
             userRepository.save(userToDebit);
 
+            TransactionInfo transactionInfoDebit= TransactionInfo.builder()
+                    .transactionType("DEBIT")
+                    .accountNumber(userToDebit.getAccountNumber())
+                    .amount(request.getAmountToTransfer())
+                    .build();
+            transactionalService.saveTransactional(transactionInfoDebit);
+
             //Send email Alert
             EmailDetails emailDetailsDebit = EmailDetails.builder()
                     .recipient(userToDebit.getEmail())
@@ -250,6 +276,13 @@ public class UserService {
             User userToCredit = userRepository.findByAccountNumber(request.getToAccountNumber());
             userToCredit.setAccountBalance(userToCredit.getAccountBalance().add(request.getAmountToTransfer()));
             userRepository.save(userToCredit);
+
+            TransactionInfo transactionInfoCredit= TransactionInfo.builder()
+                    .transactionType("DEBIT")
+                    .accountNumber(userToCredit.getAccountNumber())
+                    .amount(request.getAmountToTransfer())
+                    .build();
+            transactionalService.saveTransactional(transactionInfoCredit);
 
             //Send email Alert
             EmailDetails emailDetailsCredit = EmailDetails.builder()
